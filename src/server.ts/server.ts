@@ -1,10 +1,28 @@
 import dotenv from "dotenv";
 import { createApp } from "../app.ts/app";
+import mongoose, { mongo } from "mongoose";
+
 dotenv.config();
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
-const app = createApp();
+const NODE_ENV = process.env.NODE_ENV || "development";
+const MONGO_URI = process.env.MONGO_URI ?? "mongodb://localhost:27017/myapp";
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.info("✅ Connected to MONGO DB - Congrats!");
+    const app = createApp();
+
+    app.listen(PORT, () => {
+      console.log(
+        `🚀 Server running in ${process.env.NODE_ENV} mode on http://localhost:${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error("❌ Failed to start the server", error);
+    process.exit(1);
+  }
+};
+
+startServer();
