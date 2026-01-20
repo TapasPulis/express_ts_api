@@ -1,17 +1,15 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
+import { ProductDocument } from "../models/product.model";
 
 export const createProduct = async (
-  req: Request<{}, {}, productService.Product>,
+  req: Request<{}, {}, ProductDocument>,
   res: Response
 ) => {
   try {
-    const { name, price } = req.body;
-    const newProduct = await productService.createProduct(name, price);
-    res.status(201).json({
-      message: "Product Created",
-      product: newProduct,
-    });
+    const { name, type, price } = req.body;
+    const newProduct = await productService.createProduct(name, type, price);
+    res.status(201).json(newProduct);
   } catch (error) {
     res.status(500).json({ message: "Error creating product", error });
   }
