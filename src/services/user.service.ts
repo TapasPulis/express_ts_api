@@ -1,4 +1,3 @@
-import { get } from "node:http";
 import { UserDocument, UserModel } from "../models/user.model";
 import { AppError } from "../utils/app.error";
 
@@ -20,7 +19,7 @@ export const createUser = async (name: string, email: string, age: number) => {
   };
 
   const existingUser = await UserModel.findOne({ email });
-  if (!existingUser) {
+  if (existingUser) {
     throw new AppError("User with this email already exists", 409);
   }
 
@@ -45,7 +44,6 @@ export const getUserById = async (id: string) => {
   return getUserId;
 };
 
-//
 export const updateById = async (
   id: string,
   updateData: Partial<UserDocument>,

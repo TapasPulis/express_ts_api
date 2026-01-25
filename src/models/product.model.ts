@@ -1,16 +1,9 @@
 import mongoose from "mongoose";
-
-export interface ProductDocument {
-  name: string;
-  price: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { CreateProductTypeZ } from "../schemas/product.schema";
 
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
-    type: { type: String, required: "Type is required" },
     price: { type: Number, required: "Price is required" },
   },
   {
@@ -18,7 +11,7 @@ const productSchema = new mongoose.Schema(
   },
 );
 
-export const ProductModel = mongoose.model<ProductDocument>(
+export const ProductModel = mongoose.model<CreateProductTypeZ>(
   "Product",
   productSchema,
 );
