@@ -1,23 +1,20 @@
 import { ProductDocument, ProductModel } from "../models/product.model";
+import { CreateProductTypeZ } from "../schemas/product.schema";
+import { AppError } from "../utils/app.error";
 export interface Product {
   id: number;
   name: string;
   price: number;
 }
 
-export const createProduct = async (
-  name: string,
-  type: string,
-  price: number
-) => {
+export const createProduct = async (name: string, price: number) => {
   const existingProduct = await ProductModel.findOne({ name });
   if (existingProduct) {
-    throw new Error("Product with this name already exists");
+    throw new AppError("Product with this name already exists", 409);
   }
 
   const newProduct: ProductDocument = {
     name,
-    type,
     price,
   };
   const createdProduct = await ProductModel.create(newProduct);
@@ -28,9 +25,7 @@ export const findAllProducts = async () => {
   const products = await ProductModel.find();
 
   if (products.length === 0) {
-    return {
-      message: "No products found",
-    };
+    throw new AppError("No products found", 404);
   }
   return products;
 };

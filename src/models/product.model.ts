@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 export interface ProductDocument {
   name: string;
-  type: string;
   price: number;
   createdAt?: string;
   updatedAt?: string;
@@ -16,10 +15,10 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const ProductModel = mongoose.model<ProductDocument>(
   "Product",
-  productSchema
+  productSchema,
 );
