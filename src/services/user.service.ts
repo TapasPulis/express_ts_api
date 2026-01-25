@@ -20,7 +20,7 @@ export const createUser = async (name: string, email: string, age: number) => {
   };
 
   const existingUser = await UserModel.findOne({ email });
-  if (!existingUser) {
+  if (existingUser) {
     throw new AppError("User with this email already exists", 409);
   }
 
