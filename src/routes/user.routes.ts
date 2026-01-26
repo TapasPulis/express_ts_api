@@ -4,11 +4,12 @@ import { getUserById, updateById } from "../controllers/user.controller";
 import { deleteById } from "../controllers/user.controller";
 import { validate } from "../middleware/validate.middleware";
 import { createUserValidation } from "../models/user.model";
+import { protect } from "../middleware/auth.middleware";
 
 const router = Router();
 
 router.post("/", validate(createUserValidation), createUser);
-router.get("/", getAllUser);
+router.get("/", protect, getAllUser);
 router.get("/:id", getUserById);
 router.patch("/:id", updateById);
 router.delete("/:id", deleteById);
