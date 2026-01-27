@@ -1,15 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
 import * as userService from "../services/user.service";
-import { CreateUserTypeZ } from "../models/user.model";
+import { RegisterUserTypeZ } from "../models/user.model";
 
 export const createUser = async (
-  req: Request<{}, {}, CreateUserTypeZ>,
+  req: Request<{}, {}, RegisterUserTypeZ>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { name, email, age } = req.body;
-    const newUser = await userService.createUser(name, email, age);
+    const { name, email, age, password } = req.body;
+    const newUser = await userService.createUser(name, email, age, password);
     res.status(201).json(newUser);
   } catch (error) {
     next(error);
