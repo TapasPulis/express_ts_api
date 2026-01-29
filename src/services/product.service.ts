@@ -2,7 +2,13 @@ import { ProductModel } from "../models/product.model";
 import { CreateProductTypeZ } from "../schemas/product.schema";
 import { AppError } from "../utils/app.error";
 
-export const createProduct = async (name: string, price: number) => {
+export const createProduct = async (
+  name: string,
+  price: number,
+  description: string,
+  stock: number,
+  category: string,
+) => {
   const existingProduct = await ProductModel.findOne({ name });
   if (existingProduct) {
     throw new AppError("Product with this name already exists", 409);
@@ -11,6 +17,9 @@ export const createProduct = async (name: string, price: number) => {
   const newProduct: CreateProductTypeZ = {
     name,
     price,
+    description,
+    stock,
+    category,
   };
   const createdProduct = await ProductModel.create(newProduct);
   return createdProduct;

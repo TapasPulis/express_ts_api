@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AppError } from "../utils/app.error";
+import { UserRole } from "../models/user.model";
 
 export const protect = async (
   req: Request,
@@ -24,4 +25,15 @@ export const protect = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const restrictTo = (roles: UserRole) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Forbidden. You do not have the required permissions",
+      });
+    }
+    next();
+  };
 };

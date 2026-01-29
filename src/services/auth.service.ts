@@ -50,6 +50,7 @@ export const loginUserService = async (userCredentials: LoginUserTypeZ) => {
     {
       id: user._id,
       email: user.email,
+      role: user.role,
     },
     jwtSecret,
     {

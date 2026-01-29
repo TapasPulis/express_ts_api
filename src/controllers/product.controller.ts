@@ -8,8 +8,14 @@ export const createProduct = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, price } = req.body; // Destructuring name and price from the request body
-    const newProduct = await productService.createProduct(name, price);
+    const { name, price, description, stock, category } = req.body; // Destructuring name and price from the request body
+    const newProduct = await productService.createProduct(
+      name,
+      price,
+      description,
+      stock,
+      category,
+    );
     res.status(201).json(newProduct);
   } catch (error) {
     next(error);

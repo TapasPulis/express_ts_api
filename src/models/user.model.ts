@@ -1,12 +1,15 @@
 import mongoose from "mongoose";
 import { z } from "zod";
 
+export type UserRole = "admin" | "user";
+
 export interface UserDocument {
   id: string;
   name: string;
   email: string;
   age: number;
   password: string | undefined;
+  role?: UserRole;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -42,6 +45,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
     password: { type: String, required: true, select: false },
+    role: { type: String, enum: ["admin", "user"], default: "user" },
   },
   { timestamps: true },
 );
