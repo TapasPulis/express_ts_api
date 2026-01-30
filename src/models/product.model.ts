@@ -1,6 +1,17 @@
 import mongoose from "mongoose";
 import { CreateProductTypeZ } from "../schemas/product.schema";
 
+export interface ProductDocument {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  stock: number;
+  category: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
@@ -14,7 +25,7 @@ const productSchema = new mongoose.Schema(
   },
 );
 
-export const ProductModel = mongoose.model<CreateProductTypeZ>(
+export const ProductModel = mongoose.model<ProductDocument>(
   "Product",
   productSchema,
 );
