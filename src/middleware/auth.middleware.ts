@@ -19,7 +19,7 @@ export const protect = async (
 
     const payload = decoded as JwtPayload;
 
-    req.user = { id: payload.id, role: payload.role };
+    req.user = { id: payload.id, role: payload.role, email: payload.email };
 
     next();
   } catch (error) {
