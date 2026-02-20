@@ -8,9 +8,11 @@ export const createUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, email, age, password } = req.body;
-    const newUser = await userService.createUser(name, email, age, password);
-    res.status(201).json(newUser);
+    const data = req.body;
+    const newUser = await userService.createUser(data);
+    res
+      .status(201)
+      .json({ status: "User created successfully", user: newUser });
   } catch (error) {
     next(error);
   }
