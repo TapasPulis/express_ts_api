@@ -1,18 +1,15 @@
-import bcrypt from "bcrypt";
 import { pool } from "../config/db";
 import { USER } from "../models/user.model";
 import { AppError } from "../utils/app.error";
 
-const fieldsToReturn =
-  "id, firstname, lastname, email, admin, createdat, updated_at";
+const fieldsToReturn = "id, name, email, created_at, updated_at";
 
 export const getAllUsersService = async () => {
-  // return users without password field
-  const results = await pool.query<Partial<USER>>(
+  const result = await pool.query<Partial<USER>>(
     `SELECT ${fieldsToReturn} FROM users`,
   );
-
-  return results.rows;
+  if (!result) throw new AppError("Failed to fetch users...", 500);
+  return result.rows;
 };
 
 export const getUserByIdService = async (id: string) => {
@@ -25,10 +22,9 @@ export const getUserByIdService = async (id: string) => {
 };
 
 export const createUserService = async (data: Partial<USER>) => {
-  const query = `INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) returning ${fieldsToReturn}`;
+  const query = `INSERT INTO users (name, email) VALUES ($1, $2) returning ${fieldsToReturn}`;
 
-  const encryptedPassword = await bcrypt.hash(data.password as string, 10);
-  const values = [data.firstname, data.lastname, data.email, encryptedPassword];
+  const values = [data.name, data.email];
 
   const result = await pool.query<Partial<USER>>(query, values);
   if (!result) throw new AppError("Failed to create user...", 500);
@@ -40,27 +36,13 @@ export const updateUserService = async (
   id: string,
   updateData: Partial<USER>,
 ) => {
-  const fields = Object.keys(updateData);
-  const values = Object.values(updateData);
+  const query = `UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING ${fieldsToReturn}`;
 
-  const setClauses = fields
-    .map((field, index) => `${field} = $${index + 1}`)
-    .join(", ");
-
-  if (setClauses.includes("password")) {
-    const passwordIndex = fields.findIndex((field) => field === "password");
-    if (passwordIndex !== -1) {
-      const encryptedPassword = await bcrypt.hash(
-        values[passwordIndex] as string,
-        10,
-      );
-      values[passwordIndex] = encryptedPassword;
-    }
-  }
-
-  const query = `UPDATE users SET ${setClauses} WHERE id = $${fields.length + 1} RETURNING ${fieldsToReturn}`;
-
-  const result = await pool.query<Partial<USER>>(query, [...values, id]);
+  const result = await pool.query<Partial<USER>>(query, [
+    updateData.name,
+    updateData.email,
+    id,
+  ]);
   if (!result) throw new AppError("Failed to update user...", 500);
 
   return result.rows[0];

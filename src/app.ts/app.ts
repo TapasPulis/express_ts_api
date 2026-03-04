@@ -1,6 +1,9 @@
 import express, { type Request, type Response } from "express";
 import { errorHandler } from "../middleware/error.middleware";
 import userRoutes from "../routes/user.routes";
+import productRoutes from "../routes/product.routes";
+import orderRoutes from "../routes/order.routes";
+import itemsRoutes from "../routes/items.routes";
 
 export const createApp = () => {
   const app = express();
@@ -10,6 +13,11 @@ export const createApp = () => {
   // * routes
   app.use("/api/users", userRoutes);
 
+  app.use("/api/products", productRoutes);
+
+  app.use("/api/orders", orderRoutes);
+
+  app.use("/api/orders/:id/items", itemsRoutes);
   // * error handling middleware
   app.use(errorHandler); // new line
 
