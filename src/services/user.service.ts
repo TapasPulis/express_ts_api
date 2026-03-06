@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../config/db";
-import { USER } from "../models/user.model";
 import { AppError } from "../utils/app.error";
+import { CreateUserTypeZ } from "../models/user.model";
+import id from "zod/v4/locales/id.js";
 
 export const getAllUsersService = async () => {
   const users = await prisma.user.findMany({
@@ -16,62 +17,55 @@ export const getAllUsersService = async () => {
   return users;
 };
 
-// export const getUserByIdService = async (id: string) => {
-//   const query = `SELECT ${fieldsToReturn} FROM users WHERE id = $1`;
+export const createUserService = async (data: CreateUserTypeZ) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
 
-//   const result = await pool.query<Partial<USER>>(query, [id]);
-//   if (!result) throw new AppError("User not found...", 404);
+  if (existingUser) {
+    throw new AppError("User with that email already exists", 409);
+  }
 
-//   return result.rows[0] || null;
-// };
+  // encrypt the password
+  const hashedPassword = await bcrypt.hash(data.password, 12);
 
-// export const createUserService = async (data: Partial<USER>) => {
-//   const query = `INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) returning ${fieldsToReturn}`;
+  return prisma.user.create({
+    data: {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      password: hashedPassword,
+    },
+  });
+};
 
-//   const encryptedPassword = await bcrypt.hash(data.password as string, 10);
-//   const values = [data.firstname, data.lastname, data.email, encryptedPassword];
+export const getUserByIdService = async (id: number) => {
+  const user = await prisma.user.findUnique({
+    where: { id: id },
+  });
+  return user;
+};
 
-//   const result = await pool.query<Partial<USER>>(query, values);
-//   if (!result) throw new AppError("Failed to create user...", 500);
+export const updateUserByIdService = async (
+  id: number,
+  data: CreateUserTypeZ,
+) => {
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+  const updatedUser = await prisma.user.update({
+    where: { id: id },
+    data: {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      password: hashedPassword,
+    },
+  });
+  return updatedUser;
+};
 
-//   return result.rows[0];
-// };
-
-// export const updateUserService = async (
-//   id: string,
-//   updateData: Partial<USER>,
-// ) => {
-//   const fields = Object.keys(updateData);
-//   const values = Object.values(updateData);
-
-//   const setClauses = fields
-//     .map((field, index) => `${field} = $${index + 1}`)
-//     .join(", ");
-
-//   if (setClauses.includes("password")) {
-//     const passwordIndex = fields.findIndex((field) => field === "password");
-//     if (passwordIndex !== -1) {
-//       const encryptedPassword = await bcrypt.hash(
-//         values[passwordIndex] as string,
-//         10,
-//       );
-//       values[passwordIndex] = encryptedPassword;
-//     }
-//   }
-
-//   const query = `UPDATE users SET ${setClauses} WHERE id = $${fields.length + 1} RETURNING ${fieldsToReturn}`;
-
-//   const result = await pool.query<Partial<USER>>(query, [...values, id]);
-//   if (!result) throw new AppError("Failed to update user...", 500);
-
-//   return result.rows[0];
-// };
-
-// export const deleteUserService = async (id: string) => {
-//   const query = `DELETE FROM users WHERE id = $1 RETURNING ${fieldsToReturn}`;
-
-//   const result = await pool.query<Partial<USER>>(query, [id]);
-//   if (!result) throw new AppError("Failed to delete user...", 500);
-
-//   return result.rows[0];
-// };
+export const deleteUserByIdService = async (id: number) => {
+  const deletedUser = await prisma.user.delete({
+    where: { id: id },
+  });
+  return deletedUser;
+};
